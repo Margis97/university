@@ -1,0 +1,99 @@
+name: Automated tests
+
+on:
+  push:
+
+jobs:
+  lint-code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff linter
+        run: |
+          ruff check . --ignore E722
+
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    needs: lint-code
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3 # для получения кода из репозитория
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: docker build -t margosha197/my_test_image:latest .
+
+      - name: Push in Hub
+        run: docker push margosha197/my_test_image:latest
+
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: build-and-push-image
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
+      - name: Set up Docker Compose
+        uses: arrterian/actions/docker-compose-action@v1.1.0
+
+      - name: Start Docker Compose services
+        run: docker-compose up -d
+
+      - name: Run tests
+        run: docker run --rm --network mynetwork my_test_image pytest --alluredir=result
+
+      - name: Upload Allure results
+        uses: actions/upload-artifact@v3
+        with:
+          name: result
+          path: result
+
+  generate-report:
+    runs-on: ubuntu-latest
+    needs: run-tests
+
+    steps:
+      - name: Download Allure results artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: result
+          path: result
+
+      - name: Install Allure CLI
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/download/2.35.1/allure-2.35.1.tgz
+          tar -zxvf allure-2.35.1.tgz
+          sudo mv allure-2.35.1 /opt/allure
+          echo "/opt/allure/bin" >> $GITHUB_PATH
+
+      - name: Generate Allure report
+        run: allure generate result --clean -o report
+
+      - name: Upload Allure report artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: report
+          path: report
