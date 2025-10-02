@@ -56,13 +56,16 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Set up docker-compose
+        run: sudo apt-get install docker-compose-v2
+
       - name: Set up Docker
         uses: docker/setup-docker-action@v4
 
       - name: Setup Docker Compose
-        uses: docker/setup-compose-action@v2
+        uses: docker/setup-compose-action@latest
         with:
-          version: latest
+            version: 'latest'
 
       - name: Set up Docker Compose
         run: docker compose up -d
