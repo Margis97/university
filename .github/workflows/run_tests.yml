@@ -60,7 +60,7 @@ jobs:
         uses: docker/setup-docker-action@v4
 
       - name: Setup Docker Compose
-        uses: docker/setup-compose-action@v3
+        uses: docker/setup-compose-action@v1
         with:
           version: latest
 
