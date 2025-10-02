@@ -56,6 +56,14 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+
+      - name: Setup Docker Compose
+        uses: docker/setup-compose-action@v3
+        with:
+          version: latest
+
       - name: Set up Docker Compose
         run: docker-compose up -d
 
