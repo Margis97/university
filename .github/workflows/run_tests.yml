@@ -56,17 +56,33 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Set up Docker Compose
-        uses: arrterian/actions/docker-compose-action@v1.1.0
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
 
-      - name: Start Docker Compose services
+      - name: Install Docker Compose
+        run: |
+          curl -SL https://github.com/docker/compose/releases/download/v2.38.1/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+
+      - name: Create .env file
+        run: |
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_DB_AUTH=${{ secrets.POSTGRES_DB_AUTH }}" >> .env
+          echo "POSTGRES_DB_UNIVERSITY=${{ secrets.POSTGRES_DB_UNIVERSITY }}" >> .env
+          echo "AUTH_SERVICE_INTERNAL_URL=${{ secrets.AUTH_SERVICE_INTERNAL_URL }}" >> .env
+          echo "AUTH_SERVICE_API_URL=${{ secrets.AUTH_SERVICE_API_URL }}" >> .env
+          echo "UNIVERSITY_SERVICE_INTERNAL_URL=${{ secrets.UNIVERSITY_SERVICE_INTERNAL_URL }}" >> .env
+          echo "UNIVERSITY_SERVICE_API_URL=${{ secrets.UNIVERSITY_SERVICE_API_URL }}" >> .env
+
+      - name: Set up Docker Compose
         run: docker-compose up -d
 
       - name: Run tests
         run: docker run --rm --network mynetwork my_test_image pytest --alluredir=result
 
       - name: Upload Allure results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: result
           path: result
@@ -77,7 +93,7 @@ jobs:
 
     steps:
       - name: Download Allure results artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: result
           path: result
@@ -93,7 +109,7 @@ jobs:
         run: allure generate result --clean -o report
 
       - name: Upload Allure report artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: report
           path: report
