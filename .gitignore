@@ -15,6 +15,7 @@ services/university/helpers/__pycache__/
 services/university/models/__pycache__/
 utils/__pycache__/
 .env
+env
 
 
 
