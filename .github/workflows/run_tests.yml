@@ -78,8 +78,14 @@ jobs:
       - name: Set up Docker Compose
         run: docker-compose up -d
 
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Run tests
-        run: docker run --rm --network mynetwork my_test_image pytest --alluredir=result
+        run: docker run --rm --network mynetwork margosha197/my_test_image pytest --alluredir=result
 
       - name: Upload Allure results
         uses: actions/upload-artifact@v4
