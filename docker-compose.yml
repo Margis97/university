@@ -37,7 +37,7 @@ services:
 
   auth:
     image: mekidmetal/auth-service
-    container_name: auth-service
+    container_name: auth
     environment:
       UNIVERSITY_SERVICE_INTERNAL_URL: ${UNIVERSITY_SERVICE_INTERNAL_URL}
       UNIVERSITY_SERVICE_API_URL: ${UNIVERSITY_SERVICE_API_URL}
@@ -56,7 +56,7 @@ services:
 
   university:
     image: mekidmetal/university-service
-    container_name: university-service
+    container_name: university
     environment:
       AUTH_SERVICE_INTERNAL_URL: ${AUTH_SERVICE_INTERNAL_URL}
       AUTH_SERVICE_API_URL: ${AUTH_SERVICE_API_URL}
