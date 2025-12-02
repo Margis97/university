@@ -85,7 +85,7 @@ jobs:
             password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Run tests
-        run: docker run --rm --network mynetwork margosha197/my_test_image pytest --alluredir=result
+        run: docker run --rm --network mynetwork -v "${PWD}/result:/app/result" margosha197/my_test_image pytest --alluredir=/app/result
 
       - name: Upload Allure results
         uses: actions/upload-artifact@v4
