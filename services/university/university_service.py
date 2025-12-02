@@ -9,7 +9,7 @@ from utils.api_utils import ApiUtils
 
 
 class UniversityService:
-    SERVICE_URL = "http://127.0.0.1:8001"
+    SERVICE_URL = "http://university:8000"
 
     def __init__(self, api_utils: ApiUtils):
         self.api_utils = api_utils
